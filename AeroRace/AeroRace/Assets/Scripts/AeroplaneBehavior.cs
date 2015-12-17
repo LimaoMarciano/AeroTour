@@ -16,9 +16,9 @@ public class AeroplaneBehavior : MonoBehaviour {
 
 	public float maxWingLift = 10000;
 	public float liftPerSpeed = 33;
-	private float airForwardVelocity;
-	private float airUpVelocity;
-	private float airRightVelocity;
+	public float airForwardVelocity;
+	public float airUpVelocity;
+	public float airRightVelocity;
 	private float currentLift;
 	private Vector3 airDirection;
 
@@ -100,14 +100,36 @@ public class AeroplaneBehavior : MonoBehaviour {
 		if (currentLift > maxWingLift) {
 			currentLift = maxWingLift;
 		}
-		Debug.Log ("Wind Speed:" + airForwardVelocity + ", Lift:" + currentLift);
+		//Debug.Log ("Wind Speed:" + airForwardVelocity + ", Lift:" + currentLift);
 		rb.AddForceAtPosition(transform.up * currentLift, liftPosition.transform.position);
 	}
 
 	private void AirResistence () {
-		float dragPerSpeed = 0.007f;
-		float airResistence = rb.velocity.magnitude * dragPerSpeed;
-		rb.drag = airResistence;
+		float forwardDrag;
+		float upDrag;
+		float rightDrag;
+		float airDensity = 1.2f;
+		Vector3 dragForce;
+		float forwardArea = 3;
+		float upArea = 10;
+		float rightArea = 5;
+		float forwardDragC = 0.07f;
+		float upDragC = 1.15f;
+		float rightDragC = 0.47f;
+
+		dragForce = Vector3.zero;
+
+		forwardDrag = forwardDragC * forwardArea * 0.5f * airDensity * Mathf.Pow (airForwardVelocity, 2);
+		upDrag = upDragC * upArea * 0.5f * airDensity * airUpVelocity * Mathf.Pow (airUpVelocity, 2);
+		rightDrag = rightDragC * rightArea * 0.5f * airDensity * Mathf.Pow (airRightVelocity, 2);
+
+		dragForce = new Vector3 (-rightDrag, -upDrag, -forwardDrag);
+		rb.AddRelativeForce(dragForce);
+
+		Debug.Log ("Drag force: " + dragForce);
+//		float dragPerSpeed = 0.007f;
+//		float airResistence = rb.velocity.magnitude * dragPerSpeed;
+//		rb.drag = airResistence;
 	}
 
 	void LateUpdate () {
