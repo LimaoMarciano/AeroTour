@@ -75,15 +75,15 @@ public class AeroplaneBehavior : MonoBehaviour {
 		rb.AddRelativeTorque(Vector3.forward * aileronsPower * -angle);
 	}
 
-	private void PitchAirResistance () {
-		float maxAngle = 180;
-		float pitchDrag;
-		float angleDif;
-
-		angleDif = Vector3.Angle(transform.forward, rb.velocity);
-		pitchDrag = (maxPitchDrag * angleDif) / maxAngle;
-		rb.drag = pitchDrag;
-	}
+//	private void PitchAirResistance () {
+//		float maxAngle = 180;
+//		float pitchDrag;
+//		float angleDif;
+//
+//		angleDif = Vector3.Angle(transform.forward, rb.velocity);
+//		pitchDrag = (maxPitchDrag * angleDif) / maxAngle;
+//		rb.drag = pitchDrag;
+//	}
 
 	//public float maxWingSpeedLift = 500;
 
