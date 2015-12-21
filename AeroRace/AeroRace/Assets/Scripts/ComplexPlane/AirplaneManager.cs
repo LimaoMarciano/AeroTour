@@ -8,10 +8,13 @@ public class AirplaneManager : MonoBehaviour {
 	public GameObject rightWingObject;
 	public GameObject leftHStabilizerObject;
 	public GameObject rightHStabilizerObject;
+	public GameObject verticalStabilizerObject;
+
 	private WingBehaviour leftWing;
 	private WingBehaviour rightWing;
 	private HorizontalStabilizer leftHStabilizer;
 	private HorizontalStabilizer rightHStabilizer;
+	private VerticalStabilizer verticalStabilizer;
 
 	public float thrustPower = 10000;
 	public float elevatorPower = 2000;
@@ -21,6 +24,9 @@ public class AirplaneManager : MonoBehaviour {
 	private Rigidbody rb;
 	private float iHorizontal;
 	private float iVertical;
+	private float iRudder;
+	private float iFlap;
+	private bool isFlapOn = false;
 	private float thrustLevel = 0;
 
 	public float airForwardVelocity;
@@ -33,19 +39,20 @@ public class AirplaneManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
-		leftWing = leftWingObject.GetComponent<WingBehaviour>();
-		rightWing = rightWingObject.GetComponent<WingBehaviour>();
-		leftHStabilizer = leftHStabilizerObject.GetComponent<HorizontalStabilizer>();
-		rightHStabilizer = rightHStabilizerObject.GetComponent<HorizontalStabilizer>();
+		leftWing = leftWingObject.GetComponent<WingBehaviour> ();
+		rightWing = rightWingObject.GetComponent<WingBehaviour> ();
+		leftHStabilizer = leftHStabilizerObject.GetComponent<HorizontalStabilizer> ();
+		rightHStabilizer = rightHStabilizerObject.GetComponent<HorizontalStabilizer> ();
+		verticalStabilizer = verticalStabilizerObject.GetComponent<VerticalStabilizer> ();
 //		rb.centerOfMass = centerOfMass.transform.position;
-
-		Debug.Log("Test math: " + Mathf.Pow( 2, 2));
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		iHorizontal = Input.GetAxis("Horizontal");
 		iVertical = Input.GetAxis("Vertical");
+		iRudder = Input.GetAxis ("Rudder");
+
 
 		if(Input.GetButton("IncreaseSpeed")) {
 			thrustLevel += 0.5f * Time.deltaTime;
@@ -53,6 +60,7 @@ public class AirplaneManager : MonoBehaviour {
 				thrustLevel = 1;
 			}
 		}
+
 		if(Input.GetButton("DecreaseSpeed")) {
 			thrustLevel -= 0.5f * Time.deltaTime;
 			if (thrustLevel < 0) {
@@ -60,7 +68,17 @@ public class AirplaneManager : MonoBehaviour {
 			}
 		}
 
-
+		if (Input.GetButtonDown ("Flap") && !isFlapOn) {
+			isFlapOn = true;
+			iFlap = 1;
+			Debug.Log ("Flap on!");
+		}
+		else if (Input.GetButtonDown ("Flap") && isFlapOn) {
+			isFlapOn = false;
+			iFlap = 0;
+			Debug.Log ("Flap off!");
+		}
+			
 	}
 
 	void FixedUpdate () {
@@ -68,10 +86,11 @@ public class AirplaneManager : MonoBehaviour {
 		AirResistence();
 		leftHStabilizer.AdjustElevatorAngle(iVertical);
 		rightHStabilizer.AdjustElevatorAngle(iVertical);
-//		Elevator(iVertical);
+		verticalStabilizer.AdjustRudderAngle (iRudder);
 		rightWing.adjustAileronAngle(-iHorizontal);
 		leftWing.adjustAileronAngle(iHorizontal);
-
+		rightWing.adjustFlapAngle (iFlap);
+		leftWing.adjustFlapAngle (iFlap);
 		Thruster(thrustLevel);
 
 		}

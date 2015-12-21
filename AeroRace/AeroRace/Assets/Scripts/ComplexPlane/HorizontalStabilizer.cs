@@ -14,6 +14,8 @@ public class HorizontalStabilizer : MonoBehaviour {
 	public float liftPerElevatorAngle = 30;
 	public float elevatorEfficientSpeed = 50;
 
+	private float elevatorLift;
+
 	// Use this for initialization
 	void Start () {
 		rb = airplane.GetComponent<Rigidbody>();
@@ -29,9 +31,12 @@ public class HorizontalStabilizer : MonoBehaviour {
 		CalculateElevatorLift();
 	}
 
+	void LateUpdate () {
+		DebugForceLines ();
+	}
+
 	private void CalculateElevatorLift () {
 		float elevatorEfficiency;
-		float elevatorLift;
 		elevatorEfficiency = am.airForwardVelocity / elevatorEfficientSpeed;
 		elevatorLift = elevatorAngle * liftPerElevatorAngle * elevatorEfficiency;
 
@@ -40,5 +45,12 @@ public class HorizontalStabilizer : MonoBehaviour {
 
 	public void AdjustElevatorAngle (float input) {
 		elevatorAngle = (maxElevatorAngle * input) + elevatorAngleOffset;
+	}
+
+	private void DebugForceLines () {
+		Vector3 elevatorOffset = new Vector3 (0, 0, 0f);
+
+		Debug.DrawLine(liftPosition.transform.position, transform.up * (elevatorLift / 500) + liftPosition.transform.position, Color.yellow);
+		Debug.DrawLine(liftPosition.transform.position, -transform.forward * (am.airForwardVelocity / 100) + liftPosition.transform.position, Color.blue);
 	}
 }
