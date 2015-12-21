@@ -14,6 +14,9 @@ public class WingBehaviour : MonoBehaviour {
 	private AirplaneManager am;
 	private float aileronAngle = 0;
 
+	private float aileronLift;
+	private float wingLift;
+
 	// Use this for initialization
 	void Start () {
 		rb = Airplane.GetComponent<Rigidbody>();
@@ -27,16 +30,19 @@ public class WingBehaviour : MonoBehaviour {
 
 	}
 
+	void LateUpdate () {
+		DebugForceLines();
+	}
+
 	private void CalculateWingLift () {
 
-		float currentLift = liftPerSpeed * am.airForwardVelocity;
-		rb.AddForceAtPosition(transform.up * currentLift, liftPosition.transform.position);
-		Debug.Log("Lift: " + currentLift);
+		wingLift = liftPerSpeed * am.airForwardVelocity;
+		rb.AddForceAtPosition(transform.up * wingLift, liftPosition.transform.position);
+		Debug.Log("Lift: " + wingLift);
 	}
 
 	private void CalculateAileronLift () {
 		float aileronEfficiency;
-		float aileronLift; 
 		aileronEfficiency = am.airForwardVelocity / aileronEfficientSpeed;
 		aileronLift = liftPerAileronAngle * aileronAngle * aileronEfficiency;
 		rb.AddForceAtPosition(transform.up * aileronLift, liftPosition.transform.position);
@@ -44,5 +50,13 @@ public class WingBehaviour : MonoBehaviour {
 
 	public void adjustAileronAngle(float input) {
 		aileronAngle = maxAileronAngle * input;
+	}
+
+	private void DebugForceLines () {
+		Vector3 aileronOffset = new Vector3 (0, 0, 0.05f);
+
+		Debug.DrawLine(liftPosition.transform.position, transform.forward * (am.airForwardVelocity / 50) + liftPosition.transform.position, Color.blue);
+		Debug.DrawLine(liftPosition.transform.position, transform.up * (wingLift / 1000) + liftPosition.transform.position, Color.green);
+		Debug.DrawLine(liftPosition.transform.position + aileronOffset, transform.up * (aileronLift / 200) + liftPosition.transform.position + aileronOffset, Color.yellow);
 	}
 }

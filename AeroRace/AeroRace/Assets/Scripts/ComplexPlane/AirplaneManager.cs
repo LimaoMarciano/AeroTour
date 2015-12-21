@@ -3,10 +3,15 @@ using System.Collections;
 
 public class AirplaneManager : MonoBehaviour {
 
+	public GameObject centerOfMass;
 	public GameObject leftWingObject;
 	public GameObject rightWingObject;
+	public GameObject leftHStabilizerObject;
+	public GameObject rightHStabilizerObject;
 	private WingBehaviour leftWing;
 	private WingBehaviour rightWing;
+	private HorizontalStabilizer leftHStabilizer;
+	private HorizontalStabilizer rightHStabilizer;
 
 	public float thrustPower = 10000;
 	public float elevatorPower = 2000;
@@ -21,12 +26,20 @@ public class AirplaneManager : MonoBehaviour {
 	public float airForwardVelocity;
 	public float airUpVelocity;
 	public float airRightVelocity;
+	private Vector3 localVelocity;
+	private Vector3 dragForce;
+
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
 		leftWing = leftWingObject.GetComponent<WingBehaviour>();
 		rightWing = rightWingObject.GetComponent<WingBehaviour>();
+		leftHStabilizer = leftHStabilizerObject.GetComponent<HorizontalStabilizer>();
+		rightHStabilizer = rightHStabilizerObject.GetComponent<HorizontalStabilizer>();
+//		rb.centerOfMass = centerOfMass.transform.position;
+
+		Debug.Log("Test math: " + Mathf.Pow( 2, 2));
 	}
 	
 	// Update is called once per frame
@@ -51,18 +64,30 @@ public class AirplaneManager : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-		AirResistence();
 		calculateAirSpeed();
-		Elevator(iVertical);
-		leftWing.adjustAileronAngle(iHorizontal);
+		AirResistence();
+		leftHStabilizer.AdjustElevatorAngle(iVertical);
+		rightHStabilizer.AdjustElevatorAngle(iVertical);
+//		Elevator(iVertical);
 		rightWing.adjustAileronAngle(-iHorizontal);
+		leftWing.adjustAileronAngle(iHorizontal);
+
 		Thruster(thrustLevel);
+
+		}
+
+	void LateUpdate () {
+		DebugDragForceLines();
 	}
 
 	private void calculateAirSpeed() {
-		airForwardVelocity = Vector3.Dot(rb.velocity, transform.forward);
-		airUpVelocity = Vector3.Dot(rb.velocity, transform.up);
-		airRightVelocity = Vector3.Dot(rb.velocity, transform.right);
+		localVelocity = transform.InverseTransformDirection(rb.velocity);
+		airForwardVelocity = localVelocity.z;
+		airUpVelocity = localVelocity.y;
+		airRightVelocity = localVelocity.x;
+//		airForwardVelocity = Vector3.Dot(rb.velocity, transform.forward);
+//		airUpVelocity = Vector3.Dot(rb.velocity, transform.up);
+//		airRightVelocity = Vector3.Dot(rb.velocity, transform.right);
 	}
 
 	private void Thruster(float throttle) {
@@ -80,10 +105,9 @@ public class AirplaneManager : MonoBehaviour {
 		float upDrag;
 		float rightDrag;
 		float airDensity = 1.2f;
-		Vector3 dragForce;
 		float forwardArea = 3;
-		float upArea = 10;
-		float rightArea = 5;
+		float upArea = 8;
+		float rightArea = 4;
 		float forwardDragC = 0.07f;
 		float upDragC = 1.15f;
 		float rightDragC = 0.47f;
@@ -91,15 +115,35 @@ public class AirplaneManager : MonoBehaviour {
 		dragForce = Vector3.zero;
 
 		forwardDrag = forwardDragC * forwardArea * 0.5f * airDensity * Mathf.Pow (airForwardVelocity, 2);
-		upDrag = upDragC * upArea * 0.5f * airDensity * airUpVelocity * Mathf.Pow (airUpVelocity, 2);
+		upDrag = upDragC * upArea * 0.5f * airDensity * Mathf.Pow (-airUpVelocity, 2);
 		rightDrag = rightDragC * rightArea * 0.5f * airDensity * Mathf.Pow (airRightVelocity, 2);
 
-		dragForce = new Vector3 (-rightDrag, -upDrag, -forwardDrag);
-		rb.AddRelativeForce(dragForce);
+		if (airForwardVelocity < 0) forwardDrag *= -1;
+		if (airUpVelocity < 0) upDrag *= -1;
+		if (airRightVelocity < 0) rightDrag *= -1;
 
-		Debug.Log ("Drag force: " + dragForce);
+		dragForce = new Vector3 (rightDrag, upDrag, forwardDrag);
+		rb.AddRelativeForce(-dragForce);
+
+		//Debug.Log ("Drag force: " + dragForce);
 		//		float dragPerSpeed = 0.007f;
 		//		float airResistence = rb.velocity.magnitude * dragPerSpeed;
 		//		rb.drag = airResistence;
+	}
+
+	private void DebugDragForceLines () {
+		Vector3 offset = new Vector3(0, 0.3f, 0);
+		Vector3 drawPos = transform.position + offset;
+
+		//Debug.Log ("Drag: " + dragForce);
+		Debug.DrawLine (drawPos, (dragForce.x / 10000) * transform.right + drawPos, Color.red);
+		Debug.DrawLine (drawPos, (dragForce.y / 10000) * transform.up + drawPos, Color.red);
+		Debug.DrawLine (drawPos, (dragForce.z / 10000) * transform.forward + drawPos, Color.red);
+
+		//Debug.Log ("Velocity: " + localVelocity);
+		//Debug.Log ("True velocity: " + rb.velocity.magnitude);
+		Debug.DrawLine (drawPos, (localVelocity.x / 100) * transform.right + drawPos, Color.white);
+		Debug.DrawLine (drawPos, (localVelocity.y / 100) * transform.up + drawPos, Color.white);
+		Debug.DrawLine (drawPos, (localVelocity.z / 100) * transform.forward + drawPos, Color.white);
 	}
 }
