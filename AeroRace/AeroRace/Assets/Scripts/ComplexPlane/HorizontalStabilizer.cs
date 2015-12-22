@@ -9,10 +9,12 @@ public class HorizontalStabilizer : MonoBehaviour {
 	private AirplaneManager am;
 
 	private float elevatorAngle = 0;
-	private float elevatorAngleOffset = 7;
+	private float elevatorAngleOffset = 0;
 	private float maxElevatorAngle = 20;
 	public float liftPerElevatorAngle = 30;
 	public float elevatorEfficientSpeed = 50;
+	public float liftPerSpeed = 10;
+	private float wingLift;
 
 	private float elevatorLift;
 
@@ -28,11 +30,19 @@ public class HorizontalStabilizer : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
+		CalculateWingLift ();
 		CalculateElevatorLift();
 	}
 
 	void LateUpdate () {
 		DebugForceLines ();
+	}
+
+	private void CalculateWingLift () {
+
+		wingLift = liftPerSpeed * am.airForwardVelocity;
+		rb.AddForceAtPosition(transform.up * wingLift, liftPosition.transform.position);
+		//		Debug.Log("Lift: " + wingLift);
 	}
 
 	private void CalculateElevatorLift () {

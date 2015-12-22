@@ -44,7 +44,7 @@ public class AirplaneManager : MonoBehaviour {
 		leftHStabilizer = leftHStabilizerObject.GetComponent<HorizontalStabilizer> ();
 		rightHStabilizer = rightHStabilizerObject.GetComponent<HorizontalStabilizer> ();
 		verticalStabilizer = verticalStabilizerObject.GetComponent<VerticalStabilizer> ();
-//		rb.centerOfMass = centerOfMass.transform.position;
+		rb.centerOfMass = centerOfMass.transform.position - transform.position;
 	}
 	
 	// Update is called once per frame
