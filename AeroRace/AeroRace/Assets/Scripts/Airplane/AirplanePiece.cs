@@ -5,7 +5,7 @@ public class AirplanePiece : MonoBehaviour {
 
 	//Settings
 	[Header("Lift")]
-	public float criticalAngle = 0;
+	public float criticalAngle = 15;
 	public float liftCoeficient = 50;
 	public Vector3 liftDirection;
 	[Header ("Area")]
@@ -15,12 +15,14 @@ public class AirplanePiece : MonoBehaviour {
 	[Header ("Thrust")]
 	public bool canGenerateThrust = false;
 	public float thrustForce = 0;
+	public bool canChangeCenterOfMass = false;
 
 	//Needed GameObjects
 	[Header("GameObjects")]
 	public GameObject airSpeedSensorObject;
 	public GameObject liftPositionObject;
 	public GameObject thrustPositionObject;
+	public GameObject centerOfMassObject;
 
 	//Components
 	private Rigidbody rb;
@@ -32,6 +34,7 @@ public class AirplanePiece : MonoBehaviour {
 	private Vector3 airSpeedSensorLastPos;
 
 	private Vector3 dragForce;
+	private Vector3 liftForce;
 
 	// Use this for initialization
 	void Start () {
@@ -67,6 +70,15 @@ public class AirplanePiece : MonoBehaviour {
 			}
 		}
 
+		if (canChangeCenterOfMass) {
+			if (!centerOfMassObject) {
+				Debug.Log (gameObject.name + " is missing center of mass GameObject");
+				isRequisitesMet = false;
+			} else {
+				rb.centerOfMass = transform.position - centerOfMassObject.transform.position;
+			}
+		}
+
 		//Prints message if requirements failed
 		if (!isRequisitesMet) {
 			Debug.Log (gameObject.name + " is not configured correctly. Simulation disabled for this piece.");
@@ -80,15 +92,19 @@ public class AirplanePiece : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
-
+		
 		if (isRequisitesMet) {
 			CalculateAirSpeed();
 			ApplyDrag();
+			if (liftPositionObject)
+				ApplyLift();
+			if (canGenerateThrust)
+				Thrust ();
 		}
 	}
 
 	void LateUpdate () {
-		
+		DebugLines ();
 	}
 
 	/// <summary>
@@ -97,6 +113,7 @@ public class AirplanePiece : MonoBehaviour {
 	private void CalculateAirSpeed () {
 		airSpeed = (airSpeedSensorObject.transform.position - airSpeedSensorLastPos) / Time.fixedDeltaTime;
 		airSpeedSensorLastPos = airSpeedSensorObject.transform.position;
+		airSpeed = transform.InverseTransformDirection (airSpeed);
 	}
 
 	/// <summary>
@@ -114,6 +131,43 @@ public class AirplanePiece : MonoBehaviour {
 		rb.AddForceAtPosition (-dragForce, liftPositionObject.transform.position);
 	}
 
+	private void ApplyLift () {
+		float angleOfAttack;
+		float liftCoefficient;
+		float liftForceY;
+		Vector3 localAirSpeed;
 
+		localAirSpeed = transform.TransformDirection (airSpeed);
+		angleOfAttack = Vector3.Angle(transform.forward, new Vector3 (0, localAirSpeed.y, localAirSpeed.z));
+
+		liftCoeficient = 0.11f * angleOfAttack;
+		if (angleOfAttack > criticalAngle) {
+			liftCoeficient -= 0.11f * (angleOfAttack - criticalAngle);
+		}
+	
+		if (angleOfAttack < -criticalAngle) {
+			liftCoeficient += 0.11f * (angleOfAttack - criticalAngle);
+		}
+
+		liftForceY = 0.5f * airDensity * Mathf.Pow (airSpeed.z, 2) * area.y * liftCoeficient;
+		if (airSpeed.z < 0)
+			liftForceY *= -1;
+
+		liftForce = new Vector3 (0, liftForceY, 0);
+	
+		rb.AddForceAtPosition (liftForce, liftPositionObject.transform.position);
+	}
+
+	private void Thrust() {
+		rb.AddForceAtPosition (transform.forward * thrustForce, thrustPositionObject.transform.position);
+	}
+
+	private void DebugLines () {
+		Vector3 liftPos = liftPositionObject.transform.position;
+		Debug.DrawLine (liftPos, liftPos + (transform.up * (liftForce.y / 3000)), Color.green);
+		Debug.DrawLine (liftPos, liftPos + (transform.right * (-dragForce.x / 3000)), Color.red);
+		Debug.DrawLine (liftPos, liftPos + (transform.up * (-dragForce.y / 3000)), Color.red);
+		Debug.DrawLine (liftPos, liftPos + (transform.forward * (-dragForce.z / 3000)), Color.red);
+	}
 
 }
