@@ -1,0 +1,119 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class AirplanePiece : MonoBehaviour {
+
+	//Settings
+	[Header("Lift")]
+	public float criticalAngle = 0;
+	public float liftCoeficient = 50;
+	public Vector3 liftDirection;
+	[Header ("Area")]
+	public Vector3 area = new Vector3 (1, 1, 1);
+	[Header("Drag")]
+	public Vector3 dragCoefficient = new Vector3 (0.5f, 0.5f, 0.5f);
+	[Header ("Thrust")]
+	public bool canGenerateThrust = false;
+	public float thrustForce = 0;
+
+	//Needed GameObjects
+	[Header("GameObjects")]
+	public GameObject airSpeedSensorObject;
+	public GameObject liftPositionObject;
+	public GameObject thrustPositionObject;
+
+	//Components
+	private Rigidbody rb;
+
+	//Private variables
+	private float airDensity = 1.2f;
+	private bool isRequisitesMet = true;
+	private Vector3 airSpeed;
+	private Vector3 airSpeedSensorLastPos;
+
+	private Vector3 dragForce;
+
+	// Use this for initialization
+	void Start () {
+		
+		//Try to get rigidbody from parent
+		rb = transform.root.GetComponentInChildren<Rigidbody>();
+		if (rb == null) {
+			Debug.Log (gameObject.name + " could not find Rigidbody.");
+			isRequisitesMet = false;
+		}
+
+		//Checks if it has the airSpeedSensor object and defines initial state
+		if (airSpeedSensorObject) {
+			airSpeedSensorLastPos = airSpeedSensorObject.transform.position;
+		}
+		else
+		{
+			Debug.Log (gameObject.name + " is missing speed sensor GameObject");
+			isRequisitesMet = false;
+		}
+
+		//Checks if it has liftPosition object defined
+		if (!liftPositionObject) {
+			Debug.Log (gameObject.name + " is missing lift position GameObject");
+			isRequisitesMet = false;
+		}
+
+		//Checks if it has thrustPosition object defined
+		if (canGenerateThrust) {
+			if (!thrustPositionObject) {
+				Debug.Log (gameObject.name + " is missing thrust position GameObject");
+				isRequisitesMet = false;
+			}
+		}
+
+		//Prints message if requirements failed
+		if (!isRequisitesMet) {
+			Debug.Log (gameObject.name + " is not configured correctly. Simulation disabled for this piece.");
+		}
+
+	}
+	
+	// Update is called once per frame
+	void Update () {
+	
+	}
+
+	void FixedUpdate () {
+
+		if (isRequisitesMet) {
+			CalculateAirSpeed();
+			ApplyDrag();
+		}
+	}
+
+	void LateUpdate () {
+		
+	}
+
+	/// <summary>
+	/// Calculates the air speed in m/s
+	/// </summary>
+	private void CalculateAirSpeed () {
+		airSpeed = (airSpeedSensorObject.transform.position - airSpeedSensorLastPos) / Time.fixedDeltaTime;
+		airSpeedSensorLastPos = airSpeedSensorObject.transform.position;
+	}
+
+	/// <summary>
+	/// Applies drag using the equation: 
+	/// Drag = area * dragCoefficient * airSpeed^2 * 0.5 * airDensity
+	/// </summary>
+	private void ApplyDrag () {
+
+		//Not possible to multiply two vectors, so I'm using Vector3.Scale to do that
+		dragForce = Vector3.Scale(Vector3.Scale (dragCoefficient, area), Vector3.Scale (airSpeed, airSpeed)) * 0.5f * airDensity;
+		if (airSpeed.x < 0) dragForce.x *= -1;
+		if (airSpeed.y < 0) dragForce.y *= -1;
+		if (airSpeed.z < 0) dragForce.z *= -1;
+
+		rb.AddForceAtPosition (-dragForce, liftPositionObject.transform.position);
+	}
+
+
+
+}
