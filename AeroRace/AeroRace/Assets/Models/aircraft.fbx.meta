@@ -1,0 +1,127 @@
+fileFormatVersion: 2
+guid: 36f4d46d4fda44547b567db02e4c1967
+timeCreated: 1451525968
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: aircraftCover_ml
+    100004: aircraftLFlap_ml
+    100006: aircraftLWheel_ml
+    100008: aircraftPropeller_ml
+    100010: aircraftRearLFlap_ml
+    100012: aircraftRearRFlap_ml
+    100014: aircraftRearWheel_ml
+    100016: aircraftRFlap_ml
+    100018: aircraftRWheel_ml
+    100020: aircraftTailFlap_ml
+    400000: //RootNode
+    400002: aircraftCover_ml
+    400004: aircraftLFlap_ml
+    400006: aircraftLWheel_ml
+    400008: aircraftPropeller_ml
+    400010: aircraftRearLFlap_ml
+    400012: aircraftRearRFlap_ml
+    400014: aircraftRearWheel_ml
+    400016: aircraftRFlap_ml
+    400018: aircraftRWheel_ml
+    400020: aircraftTailFlap_ml
+    2300000: //RootNode
+    2300002: aircraftCover_ml
+    2300004: aircraftLFlap_ml
+    2300006: aircraftLWheel_ml
+    2300008: aircraftPropeller_ml
+    2300010: aircraftRearLFlap_ml
+    2300012: aircraftRearRFlap_ml
+    2300014: aircraftRearWheel_ml
+    2300016: aircraftRFlap_ml
+    2300018: aircraftRWheel_ml
+    2300020: aircraftTailFlap_ml
+    3300000: //RootNode
+    3300002: aircraftCover_ml
+    3300004: aircraftLFlap_ml
+    3300006: aircraftLWheel_ml
+    3300008: aircraftPropeller_ml
+    3300010: aircraftRearLFlap_ml
+    3300012: aircraftRearRFlap_ml
+    3300014: aircraftRearWheel_ml
+    3300016: aircraftRFlap_ml
+    3300018: aircraftRWheel_ml
+    3300020: aircraftTailFlap_ml
+    4300000: aircraftBody_ml
+    4300002: aircraftPropeller_ml
+    4300004: aircraftRFlap_ml
+    4300006: aircraftLFlap_ml
+    4300008: aircraftCover_ml
+    4300010: aircraftLWheel_ml
+    4300012: aircraftRWheel_ml
+    4300014: aircraftRearWheel_ml
+    4300016: aircraftRearLFlap_ml
+    4300018: aircraftTailFlap_ml
+    4300020: aircraftRearRFlap_ml
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleRotations: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

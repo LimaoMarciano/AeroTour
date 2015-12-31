@@ -9,11 +9,11 @@ public class DebugUI : MonoBehaviour {
 	public Text upAirSpeed;
 	public Text rightAirSpeed;
 
-	private AeroplaneBehavior airplaneComponent;
+	private AeroplaneBasic airplaneComponent;
 
 	// Use this for initialization
 	void Start () {
-		airplaneComponent = airplane.GetComponent<AeroplaneBehavior> ();
+		airplaneComponent = airplane.GetComponent<AeroplaneBasic> ();
 	}
 	
 	// Update is called once per frame

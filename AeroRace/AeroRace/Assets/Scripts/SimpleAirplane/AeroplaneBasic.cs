@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AeroplaneBehavior : MonoBehaviour {
+public class AeroplaneBasic : MonoBehaviour {
 
 	public float thrustPower = 10000;
 	public float elevatorPower = 2000;

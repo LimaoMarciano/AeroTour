@@ -16,6 +16,9 @@ public class AirplanePiece : MonoBehaviour {
 	public bool canGenerateThrust = false;
 	public float thrustForce = 0;
 	public bool canChangeCenterOfMass = false;
+	[Header ("Control")]
+	public float maxAngle = 15;
+	public Vector3 rotationAxis;
 
 	//Needed GameObjects
 	[Header("GameObjects")]
@@ -23,6 +26,7 @@ public class AirplanePiece : MonoBehaviour {
 	public GameObject liftPositionObject;
 	public GameObject thrustPositionObject;
 	public GameObject centerOfMassObject;
+	public GameObject controlableSurface;
 
 	//Components
 	private Rigidbody rb;
@@ -36,9 +40,15 @@ public class AirplanePiece : MonoBehaviour {
 	private Vector3 dragForce;
 	private Vector3 liftForce;
 
+	private float surfaceAngle;
+	private Vector3 initialAngle;
+
 	// Use this for initialization
 	void Start () {
-		
+
+		if (controlableSurface)
+			initialAngle = controlableSurface.transform.localEulerAngles;
+
 		//Try to get rigidbody from parent
 		rb = transform.root.GetComponentInChildren<Rigidbody>();
 		if (rb == null) {
@@ -121,16 +131,20 @@ public class AirplanePiece : MonoBehaviour {
 	/// Drag = area * dragCoefficient * airSpeed^2 * 0.5 * airDensity
 	/// </summary>
 	private void ApplyDrag () {
+		Vector3 localAirSpeed = transform.TransformDirection(airSpeed);
 
 		//Not possible to multiply two vectors, so I'm using Vector3.Scale to do that
-		dragForce = Vector3.Scale(Vector3.Scale (dragCoefficient, area), Vector3.Scale (airSpeed, airSpeed)) * 0.5f * airDensity;
-		if (airSpeed.x < 0) dragForce.x *= -1;
-		if (airSpeed.y < 0) dragForce.y *= -1;
-		if (airSpeed.z < 0) dragForce.z *= -1;
+		dragForce = Vector3.Scale(Vector3.Scale (dragCoefficient, area), Vector3.Scale (localAirSpeed, localAirSpeed)) * 0.5f * airDensity;
+		if (localAirSpeed.x < 0) dragForce.x *= -1;
+		if (localAirSpeed.y < 0) dragForce.y *= -1;
+		if (localAirSpeed.z < 0) dragForce.z *= -1;
 
 		rb.AddForceAtPosition (-dragForce, liftPositionObject.transform.position);
 	}
 
+	/// <summary>
+	/// Applies the lift.
+	/// </summary>
 	private void ApplyLift () {
 		float angleOfAttack;
 		float liftCoefficient;
@@ -142,18 +156,25 @@ public class AirplanePiece : MonoBehaviour {
 
 		liftCoeficient = 0.11f * angleOfAttack;
 		if (angleOfAttack > criticalAngle) {
-			liftCoeficient -= 0.11f * (angleOfAttack - criticalAngle);
+			liftCoeficient -= 2 * 0.11f * (angleOfAttack - criticalAngle);
 		}
 	
 		if (angleOfAttack < -criticalAngle) {
-			liftCoeficient += 0.11f * (angleOfAttack - criticalAngle);
+			liftCoeficient += 2 * 0.11f * (angleOfAttack - criticalAngle);
 		}
+
+		if (liftCoeficient < 0)
+			liftCoeficient = 0;
 
 		liftForceY = 0.5f * airDensity * Mathf.Pow (airSpeed.z, 2) * area.y * liftCoeficient;
 		if (airSpeed.z < 0)
-			liftForceY *= -1;
+			liftForceY = 0;
 
-		liftForce = new Vector3 (0, liftForceY, 0);
+		//Add controlable surface influence
+		if (controlableSurface)
+			liftForceY += (surfaceAngle / maxAngle) * 5000 * liftCoeficient;
+
+		liftForce = liftDirection * liftForceY;
 	
 		rb.AddForceAtPosition (liftForce, liftPositionObject.transform.position);
 	}
@@ -168,6 +189,11 @@ public class AirplanePiece : MonoBehaviour {
 		Debug.DrawLine (liftPos, liftPos + (transform.right * (-dragForce.x / 3000)), Color.red);
 		Debug.DrawLine (liftPos, liftPos + (transform.up * (-dragForce.y / 3000)), Color.red);
 		Debug.DrawLine (liftPos, liftPos + (transform.forward * (-dragForce.z / 3000)), Color.red);
+	}
+
+	public void rotateWing (float input) {
+		controlableSurface.transform.localEulerAngles = initialAngle + (input * maxAngle * rotationAxis);
+		surfaceAngle = input * maxAngle;
 	}
 
 }
