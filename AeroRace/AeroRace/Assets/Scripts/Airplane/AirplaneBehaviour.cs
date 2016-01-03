@@ -59,11 +59,17 @@ public class AirplaneBehaviour : MonoBehaviour {
 	private float upDrag;
 	private float sideDrag;
 
-	private float thrustLevel = 1;
+	private float thrustLevel = 0;
 	private float wingAngleOfAttack;
 
 	private float hInput;
 	private float vInput;
+
+	void Awake () {
+		//Fix for unity5 bug where wheels get locked at start
+		foreach (WheelCollider w in GetComponentsInChildren<WheelCollider>()) 
+			w.motorTorque = 0.000001f;
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -118,10 +124,6 @@ public class AirplaneBehaviour : MonoBehaviour {
 		Vector3 thrust;
 		thrust = thrustLevel * thrustForce * thrustVector;
 		rb.AddRelativeForce (thrust);
-	}
-
-	public void ChangeThrustLevel (float thrustIncrement) {
-		thrustLevel -= thrustIncrement * Time.deltaTime;
 	}
 
 	private float CalculateLift (Vector3 airSpeed, float liftMultiplier, float liftCoefficient, float angleCoefficient) {
@@ -196,20 +198,20 @@ public class AirplaneBehaviour : MonoBehaviour {
 
 		if (useFlap) {
 			criticalAngleOfAttack -= flapCriticalAoAOffset / 2;
-			angleCoefficient = (angleOfAttack + flapCriticalAoAOffset + 5) * 0.08f;
+			angleCoefficient = (angleOfAttack + flapCriticalAoAOffset + 5) * 0.07f;
 		}
 		else {
-			angleCoefficient = (angleOfAttack + 5)* 0.08f;
+			angleCoefficient = (angleOfAttack + 5)* 0.07f;
 		}
 			
 		if (angleOfAttack > criticalAngleOfAttack) {
-			float excess = (angleOfAttack - criticalAngleOfAttack) * 0.08f;
+			float excess = (angleOfAttack - criticalAngleOfAttack) * 0.07f;
 			angleCoefficient -= 2 * excess;
 			if (angleOfAttack > 25)
 				angleCoefficient = 0;
 		}
 		if (angleOfAttack < -criticalAngleOfAttack) {
-			float excess = (angleOfAttack + criticalAngleOfAttack) * 0.08f;
+			float excess = (angleOfAttack + criticalAngleOfAttack) * 0.07f;
 			angleCoefficient -= 2 * excess;
 			if (angleOfAttack < -25)
 				angleCoefficient = 0;
@@ -292,5 +294,22 @@ public class AirplaneBehaviour : MonoBehaviour {
 		coefficientValues.Add(tailWingAngleCoefficient);
 
 		return coefficientValues;
+	}
+
+	public float GetEngineLevel() {
+		return thrustLevel;
+	}
+
+	public bool GetFlapsStatus() {
+		return isFlapOn;
+	}
+
+	public void ChangeThrustLevel (float thrustIncrement) {
+		thrustLevel += thrustIncrement * Time.deltaTime;
+		thrustLevel = Mathf.Clamp01(thrustLevel);
+	}
+
+	public void ToggleFlaps () {
+		isFlapOn = !isFlapOn;
 	}
 }
