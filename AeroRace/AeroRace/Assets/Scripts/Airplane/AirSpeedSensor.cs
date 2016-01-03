@@ -15,10 +15,18 @@ public class AirSpeedSensor : MonoBehaviour {
 		CalculateAirSpeed();
 	}
 
+	void LateUpdate () {
+		Debug.DrawLine (transform.position, transform.position + (transform.forward * airSpeed.z) / 50, Color.blue);
+		Debug.DrawLine (transform.position, transform.position + (transform.up * airSpeed.y) / 50, Color.blue);
+		Debug.DrawLine (transform.position, transform.position + (transform.right * airSpeed.x) / 50, Color.blue);
+		Debug.DrawLine (transform.position, transform.position + transform.TransformDirection(airSpeed) / 50, Color.white);
+	}
+
 	private void CalculateAirSpeed () {
 		airSpeed = (transform.position - lastPosition) / Time.fixedDeltaTime;
 		lastPosition = transform.position;
-		airSpeed = transform.InverseTransformDirection (airSpeed);
+		airSpeed = transform.InverseTransformDirection(airSpeed);
+
 	}
 
 	public Vector3 AirSpeed () {
