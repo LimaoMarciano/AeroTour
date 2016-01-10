@@ -83,6 +83,8 @@ public class AirplaneBehaviour : MonoBehaviour {
 		rb.AddTorque(transform.forward * -hInput * 4000);
 		rb.AddTorque(transform.right * vInput * 8000);
 
+
+
 		Vector3 velocity = rb.velocity;
 
 		ApplyThrust();
