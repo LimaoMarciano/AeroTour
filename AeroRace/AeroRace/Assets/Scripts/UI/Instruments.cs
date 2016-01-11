@@ -4,9 +4,10 @@ using UnityEngine.UI;
 
 public class Instruments : MonoBehaviour {
 
-	public AirplaneBehaviour airplane;
+	public AerodynamicBehaviour airplane;
 	public Text airSpeed;
 	public Text altimeter;
+	public Text liftReserve;
 	public Image engineBar;
 	public Image flapsLight;
 	public Image stallLight;
@@ -17,8 +18,9 @@ public class Instruments : MonoBehaviour {
 	private float airSpeedKnots;
 	private float altitude;
 	private float thrustLevel;
+	private float angleOfAttack;
 	private bool isFlapOn;
-	private Vector3 angleOfAttack;
+//	private Vector3 angleOfAttack;
 
 	private float stallTimer = 0;
 	private float stallSpeedTimer = 0;
@@ -31,9 +33,11 @@ public class Instruments : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		//Air speed
-//		airSpeedMeters = airplane.GetAirSpeed()[0].z;
-//		airSpeedKnots = airSpeedMeters * 1.943f;
-//		airSpeed.text = airSpeedKnots.ToString("#");
+		airSpeedMeters = airplane.GetAirSpeed().z;
+		airSpeedKnots = airSpeedMeters * 1.943f;
+		airSpeed.text = airSpeedKnots.ToString("#");
+
+		liftReserve.text = airplane.GetAngleOfAttack().ToString("#");
 //
 //		//Altimeter
 //		altitude = airplane.transform.position.y * 3.28f;

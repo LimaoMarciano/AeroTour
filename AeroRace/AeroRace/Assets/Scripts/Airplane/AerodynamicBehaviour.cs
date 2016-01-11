@@ -13,6 +13,7 @@ public class AerodynamicBehaviour : MonoBehaviour {
 	public float criticalAngleOfAttack = 15;
 	public float maxFunctionalAoA = 25;
 	public float perAngleBoost = 0.07f;
+	public float angleCoefficientShift = 5;
 	public float angleOffset = 0;
 	public Transform liftPosition;
 	public AirSpeedSensor speedSensorObj;
@@ -103,7 +104,7 @@ public class AerodynamicBehaviour : MonoBehaviour {
 
 	private float CalculateAngleCoefficient () {
 
-		angleCoefficient = (angleOfAttack + 5)* perAngleBoost;
+		angleCoefficient = (angleOfAttack + angleCoefficientShift)* perAngleBoost;
 
 		if (angleOfAttack > criticalAngleOfAttack) {
 			float excess = (angleOfAttack - criticalAngleOfAttack) * perAngleBoost;
@@ -181,5 +182,13 @@ public class AerodynamicBehaviour : MonoBehaviour {
 	public void SetControlSurfaceInput (float input) {
 		input = Mathf.Clamp(input, -1, 1);
 		controlSurfaceInput = input;
+	}
+
+	public Vector3 GetAirSpeed() {
+		return airSpeed;
+	}
+
+	public float GetAngleOfAttack() {
+		return angleOfAttack;
 	}
 }

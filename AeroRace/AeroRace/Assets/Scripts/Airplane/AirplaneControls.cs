@@ -7,12 +7,14 @@ public class AirplaneControls : MonoBehaviour {
 	public AerodynamicBehaviour leftWing;
 	public AerodynamicBehaviour rightWing;
 	public AerodynamicBehaviour tailWing;
+	public AerodynamicBehaviour rudder;
 
 	public float engineIncrementPerSecond = 0.5f;
 
 	private float engineIncrement;
 	private float hInput;
 	private float vInput;
+	private float rudderInput;
 
 	// Use this for initialization
 	void Start () {
@@ -24,10 +26,13 @@ public class AirplaneControls : MonoBehaviour {
 
 		hInput = Input.GetAxis("Horizontal");
 		vInput = Input.GetAxis("Vertical");
+		rudderInput = Input.GetAxis("Rudder");
+
 
 		leftWing.SetControlSurfaceInput(hInput);
 		rightWing.SetControlSurfaceInput(-hInput);
 		tailWing.SetControlSurfaceInput(vInput);
+		rudder.SetControlSurfaceInput(-rudderInput);
 
 		//Engine control
 		if (Input.GetButton("IncreaseSpeed"))
